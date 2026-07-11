@@ -9,6 +9,7 @@ const audioRoutes = require('../modules/audio/audio.routes');
 const reportingRoutes = require('../modules/reporting/reporting.routes');
 const adminRoutes = require('../modules/admin/admin.routes');
 const aiRoutes = require('../ai/ai.routes');
+const uploadRoutes = require('../upload/upload.routes');
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use('/audio', audioRoutes);
 router.use('/reports', reportingRoutes);
 router.use('/admin', adminRoutes);
 router.use('/ai', aiRoutes);
+router.use('/upload', uploadRoutes);
 
 router.get('/health', (req, res) => {
   res.json({

@@ -1,0 +1,139 @@
+import { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { productService } from '../services/api';
+import ProductCard from '../components/ProductCard';
+
+export default function Products() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [loading, setLoading] = useState(true);
+
+  const page = parseInt(searchParams.get('page')) || 1;
+  const category = searchParams.get('category') || '';
+  const search = searchParams.get('search') || '';
+
+  useEffect(() => {
+    productService.getCategories().then(setCategories).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const params = { page, limit: 12 };
+    if (category) params.category = category;
+    if (search) params.search = search;
+    productService.getAll(params)
+      .then((d) => {
+        setProducts(d.products);
+        setPagination(d.pagination);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [page, category, search]);
+
+  const updateParams = (updates) => {
+    const params = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([k, v]) => {
+      if (v) params.set(k, v);
+      else params.delete(k);
+    });
+    setSearchParams(params);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+          <p className="text-gray-500">{pagination.total} products available</p>
+        </div>
+        <div className="flex gap-3">
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) => updateParams({ search: e.target.value, page: '' })}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-full md:w-64"
+            />
+          </div>
+        </div>
+      </div>
+
+      {categories.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-8">
+          <button
+            onClick={() => updateParams({ category: '', page: '' })}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${!category ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+          >
+            All
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => updateParams({ category: cat === category ? '' : cat, page: '' })}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${category === cat ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse">
+              <div className="h-48 bg-gray-200" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-20" />
+                <div className="h-5 bg-gray-200 rounded w-40" />
+                <div className="h-4 bg-gray-200 rounded w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-gray-500 text-lg">No products found.</p>
+          <Link to="/products" className="text-emerald-600 hover:underline mt-2 inline-block">Clear filters</Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((p) => <ProductCard key={p.id} product={p} />)}
+        </div>
+      )}
+
+      {pagination.pages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-12">
+          <button
+            disabled={page <= 1}
+            onClick={() => updateParams({ page: String(page - 1) })}
+            className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <FiChevronLeft />
+          </button>
+          {[...Array(pagination.pages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => updateParams({ page: String(i + 1) })}
+              className={`w-10 h-10 rounded-lg text-sm font-medium transition ${page === i + 1 ? 'bg-emerald-600 text-white' : 'border hover:bg-gray-50'}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            disabled={page >= pagination.pages}
+            onClick={() => updateParams({ page: String(page + 1) })}
+            className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <FiChevronRight />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
