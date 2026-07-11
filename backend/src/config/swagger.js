@@ -3,16 +3,16 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'AI-Assisted UI/UX Generation Middleware - KiKUU Rwanda',
+    title: 'AI-Assisted UI/UX Generation Middleware - Kiramart Rwanda',
     version: '1.0.0',
     description: `API documentation for the AI-Assisted UI/UX Generation Middleware for Locally Tailored Kinyarwanda E-Commerce Platforms.
 
-**Case Study:** KiKUU Rwanda
+**Case Study:** Kiramart Rwanda
 
 **Purpose:** This middleware monitors user interaction behaviors (click latency, navigation patterns), analyzes user difficulties using AI, and dynamically adapts the interface by generating simplified layouts, Kinyarwanda language support, and audio prompts.`,
     contact: {
-      name: 'KiKUU Rwanda Development Team',
-      email: 'dev@kikuu.rw',
+      name: 'Kiramart Rwanda Development Team',
+      email: 'dev@kiramart.rw',
     },
     license: {
       name: 'MIT',
@@ -206,15 +206,15 @@ const swaggerDefinition = {
         type: 'object',
         required: ['text'],
         properties: {
-          text: { type: 'string', example: 'Welcome to KiKUU Rwanda' },
+          text: { type: 'string', example: 'Welcome to Kiramart Rwanda' },
           context: { type: 'string', example: 'homepage_header' },
         },
       },
       TranslationResponse: {
         type: 'object',
         properties: {
-          sourceText: { type: 'string', example: 'Welcome to KiKUU Rwanda' },
-          kinyarwandaText: { type: 'string', example: 'Murakaza neza kuri KiKUU Rwanda' },
+          sourceText: { type: 'string', example: 'Welcome to Kiramart Rwanda' },
+          kinyarwandaText: { type: 'string', example: 'Murakaza neza kuri Kiramart Rwanda' },
           fromCache: { type: 'boolean', example: true },
         },
       },
@@ -394,7 +394,7 @@ const swaggerDefinition = {
           totalBehaviorEvents: { type: 'integer', example: 12500 },
           totalTranslations: { type: 'integer', example: 320 },
           totalPredictions: { type: 'integer', example: 850 },
-          platform: { type: 'string', example: 'KiKUU Rwanda' },
+          platform: { type: 'string', example: 'Kiramart Rwanda' },
           middlewareVersion: { type: 'string', example: '1.0.0' },
         },
       },
@@ -887,7 +887,7 @@ const swaggerDefinition = {
               schema: { $ref: '#/components/schemas/TranslationInput' },
               examples: {
                 'Welcome message': {
-                  value: { text: 'Welcome to KiKUU Rwanda', context: 'homepage_header' },
+                  value: { text: 'Welcome to Kiramart Rwanda', context: 'homepage_header' },
                 },
                 'Search prompt': {
                   value: { text: 'Search products here', context: 'search_bar' },
@@ -907,7 +907,7 @@ const swaggerDefinition = {
                 schema: { $ref: '#/components/schemas/TranslationResponse' },
                 examples: {
                   'cached': {
-                    value: { sourceText: 'Welcome to KiKUU Rwanda', kinyarwandaText: 'Murakaza neza kuri KiKUU Rwanda', fromCache: true },
+                    value: { sourceText: 'Welcome to Kiramart Rwanda', kinyarwandaText: 'Murakaza neza kuri Kiramart Rwanda', fromCache: true },
                   },
                   'new': {
                     value: { sourceText: 'Checkout now', kinyarwandaText: 'Checkout now', fromCache: false },

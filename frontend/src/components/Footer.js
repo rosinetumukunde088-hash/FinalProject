@@ -3,11 +3,11 @@ import { FiShield, FiRefreshCw, FiTruck, FiHeadphones } from 'react-icons/fi';
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 mt-16">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">KiKUU Rwanda</h3>
-            <p className="text-sm leading-relaxed">
+            <h3 className="text-white text-lg font-bold mb-4">Kiramart Rwanda</h3>
+            <p className="text-sm leading-relaxed text-gray-400">
               AI-Assisted e-commerce platform tailored for Rwandan users, with Kinyarwanda language support and adaptive UI.
             </p>
           </div>
@@ -30,13 +30,13 @@ export default function Footer() {
           </div>
           <div>
             <h4 className="text-white font-semibold mb-4">Contact</h4>
-            <p className="text-sm">Kigali, Rwanda</p>
-            <p className="text-sm">info@kikuu.rw</p>
-            <p className="text-sm">+250 788 000 000</p>
+            <p className="text-sm text-gray-400">Kigali, Rwanda</p>
+            <p className="text-sm text-gray-400">info@kiramart.rw</p>
+            <p className="text-sm text-gray-400">+250 788 000 000</p>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-          <p>&copy; 2024 KiKUU Rwanda. All rights reserved.</p>
+        <div className="border-t border-gray-700/50 mt-8 pt-8 text-center text-sm text-gray-500">
+          <p>&copy; 2026 Kiramart Rwanda. All rights reserved.</p>
         </div>
       </div>
     </footer>

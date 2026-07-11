@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const multer = require('multer');
-const { authenticate, authorizeAdmin } = require('../../middleware/auth');
+const { authenticate, authorizeAdmin } = require('../middleware/auth');
 const { uploadImage, uploadAudio } = require('./upload.controller');
 
 const storage = multer.memoryStorage();

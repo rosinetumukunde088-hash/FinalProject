@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiUser, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function Login() {
   const { login, user } = useAuth();
@@ -31,10 +31,10 @@ export default function Login() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 mt-1">Sign in to your KiKUU account</p>
+            <p className="text-gray-500 mt-1">Sign in to your Kiramart account</p>
           </div>
 
           {error && (
@@ -50,8 +50,8 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="admin@kikuu.rw"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white text-gray-900"
+                  placeholder="admin@kiramart.rw"
                   required
                 />
               </div>
@@ -65,7 +65,7 @@ export default function Login() {
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white text-gray-900"
                   placeholder="••••••••"
                   required
                 />
@@ -85,8 +85,8 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Test accounts: admin@kikuu.rw / admin123 or habimana@kikuu.rw / user123</p>
-            <Link to="/register" className="text-emerald-600 hover:underline font-medium mt-2 inline-block">
+            <p>Test accounts: admin@kiramart.rw / admin123 or habimana@kiramart.rw / user123</p>
+            <Link to="/register" className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium mt-2 inline-block">
               Don't have an account? Register
             </Link>
           </div>

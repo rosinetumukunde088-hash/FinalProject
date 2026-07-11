@@ -8,11 +8,11 @@ async function main() {
   const userPassword = await bcrypt.hash('user123', 12);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@kikuu.rw' },
+    where: { email: 'admin@kiramart.rw' },
     update: {},
     create: {
       name: 'Alice Uwimana',
-      email: 'admin@kikuu.rw',
+      email: 'admin@kiramart.rw',
       password: adminPassword,
       role: 'ADMIN',
       phone: '+250788300001',
@@ -20,14 +20,14 @@ async function main() {
   });
 
   const users = [
-    { name: 'Jean Baptiste Habimana', email: 'habimana@kikuu.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123456' },
-    { name: 'Beatha Mukamana', email: 'mukamana@kikuu.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123457' },
-    { name: 'Emmanuel Niyonzima', email: 'niyonzima@kikuu.rw', password: userPassword, role: 'USER', category: 'INTERMEDIATE', phone: '+250788123458' },
-    { name: 'Chantal Uwase', email: 'uwase@kikuu.rw', password: userPassword, role: 'USER', category: 'ADVANCED', phone: '+250788123459' },
-    { name: 'Pierre Mugisha', email: 'mugisha@kikuu.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123460' },
-    { name: 'Grace Imanishimwe', email: 'imanishimwe@kikuu.rw', password: userPassword, role: 'USER', category: 'INTERMEDIATE', phone: '+250788123461' },
-    { name: 'David Hakizimana', email: 'hakizimana@kikuu.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123462' },
-    { name: 'Jeanne d\'Arc Uwimana', email: 'jeanne@kikuu.rw', password: userPassword, role: 'USER', category: 'ADVANCED', phone: '+250788123463' },
+    { name: 'Jean Baptiste Habimana', email: 'habimana@kiramart.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123456' },
+    { name: 'Beatha Mukamana', email: 'mukamana@kiramart.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123457' },
+    { name: 'Emmanuel Niyonzima', email: 'niyonzima@kiramart.rw', password: userPassword, role: 'USER', category: 'INTERMEDIATE', phone: '+250788123458' },
+    { name: 'Chantal Uwase', email: 'uwase@kiramart.rw', password: userPassword, role: 'USER', category: 'ADVANCED', phone: '+250788123459' },
+    { name: 'Pierre Mugisha', email: 'mugisha@kiramart.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123460' },
+    { name: 'Grace Imanishimwe', email: 'imanishimwe@kiramart.rw', password: userPassword, role: 'USER', category: 'INTERMEDIATE', phone: '+250788123461' },
+    { name: 'David Hakizimana', email: 'hakizimana@kiramart.rw', password: userPassword, role: 'USER', category: 'BEGINNER', phone: '+250788123462' },
+    { name: 'Jeanne d\'Arc Uwimana', email: 'jeanne@kiramart.rw', password: userPassword, role: 'USER', category: 'ADVANCED', phone: '+250788123463' },
   ];
 
   for (const u of users) {
@@ -69,7 +69,7 @@ async function main() {
   }
 
   const translations = [
-    { sourceText: 'Welcome to KiKUU', kinyarwandaText: 'Murakaza neza kuri KiKUU', context: 'homepage' },
+    { sourceText: 'Welcome to Kiramart', kinyarwandaText: 'Murakaza neza kuri Kiramart', context: 'homepage' },
     { sourceText: 'Search products', kinyarwandaText: 'Shakisha ibicuruzwa', context: 'search' },
     { sourceText: 'Add to cart', kinyarwandaText: 'Ongera mu gikapu', context: 'product' },
     { sourceText: 'Buy now', kinyarwandaText: 'Gura nonaha', context: 'checkout' },
@@ -105,16 +105,16 @@ async function main() {
   }
 
   const behaviorEntries = [
-    { email: 'habimana@kikuu.rw', latency: 5200, wrong: 4, time: 60000, repeated: 6, page: '/products' },
-    { email: 'habimana@kikuu.rw', latency: 4800, wrong: 3, time: 45000, repeated: 5, page: '/products/artisanat' },
-    { email: 'habimana@kikuu.rw', latency: 6100, wrong: 5, time: 55000, repeated: 8, page: '/checkout' },
-    { email: 'niyonzima@kikuu.rw', latency: 2500, wrong: 1, time: 30000, repeated: 3, page: '/products' },
-    { email: 'niyonzima@kikuu.rw', latency: 2800, wrong: 2, time: 25000, repeated: 2, page: '/products/electronique' },
-    { email: 'uwase@kikuu.rw', latency: 1200, wrong: 0, time: 15000, repeated: 1, page: '/products' },
-    { email: 'uwase@kikuu.rw', latency: 800, wrong: 0, time: 10000, repeated: 0, page: '/checkout' },
-    { email: 'mugisha@kikuu.rw', latency: 5500, wrong: 6, time: 70000, repeated: 10, page: '/products' },
-    { email: 'mugisha@kikuu.rw', latency: 7000, wrong: 4, time: 65000, repeated: 7, page: '/register' },
-    { email: 'hakizimana@kikuu.rw', latency: 8000, wrong: 7, time: 90000, repeated: 12, page: '/products/maison' },
+    { email: 'habimana@kiramart.rw', latency: 5200, wrong: 4, time: 60000, repeated: 6, page: '/products' },
+    { email: 'habimana@kiramart.rw', latency: 4800, wrong: 3, time: 45000, repeated: 5, page: '/products/artisanat' },
+    { email: 'habimana@kiramart.rw', latency: 6100, wrong: 5, time: 55000, repeated: 8, page: '/checkout' },
+    { email: 'niyonzima@kiramart.rw', latency: 2500, wrong: 1, time: 30000, repeated: 3, page: '/products' },
+    { email: 'niyonzima@kiramart.rw', latency: 2800, wrong: 2, time: 25000, repeated: 2, page: '/products/electronique' },
+    { email: 'uwase@kiramart.rw', latency: 1200, wrong: 0, time: 15000, repeated: 1, page: '/products' },
+    { email: 'uwase@kiramart.rw', latency: 800, wrong: 0, time: 10000, repeated: 0, page: '/checkout' },
+    { email: 'mugisha@kiramart.rw', latency: 5500, wrong: 6, time: 70000, repeated: 10, page: '/products' },
+    { email: 'mugisha@kiramart.rw', latency: 7000, wrong: 4, time: 65000, repeated: 7, page: '/register' },
+    { email: 'hakizimana@kiramart.rw', latency: 8000, wrong: 7, time: 90000, repeated: 12, page: '/products/maison' },
   ];
 
   for (const entry of behaviorEntries) {
@@ -138,15 +138,15 @@ async function main() {
   console.log('Seed data created successfully with Rwandan content!');
   console.log('');
   console.log('Test Accounts:');
-  console.log('  Admin:     admin@kikuu.rw / admin123');
-  console.log('  Beginner:  habimana@kikuu.rw / user123');
-  console.log('  Beginner:  mukamana@kikuu.rw / user123');
-  console.log('  Intermed:  niyonzima@kikuu.rw / user123');
-  console.log('  Intermed:  imanishimwe@kikuu.rw / user123');
-  console.log('  Advanced:  uwase@kikuu.rw / user123');
-  console.log('  Beginner:  mugisha@kikuu.rw / user123');
-  console.log('  Beginner:  hakizimana@kikuu.rw / user123');
-  console.log('  Advanced:  jeanne@kikuu.rw / user123');
+  console.log('  Admin:     admin@kiramart.rw / admin123');
+  console.log('  Beginner:  habimana@kiramart.rw / user123');
+  console.log('  Beginner:  mukamana@kiramart.rw / user123');
+  console.log('  Intermed:  niyonzima@kiramart.rw / user123');
+  console.log('  Intermed:  imanishimwe@kiramart.rw / user123');
+  console.log('  Advanced:  uwase@kiramart.rw / user123');
+  console.log('  Beginner:  mugisha@kiramart.rw / user123');
+  console.log('  Beginner:  hakizimana@kiramart.rw / user123');
+  console.log('  Advanced:  jeanne@kiramart.rw / user123');
   console.log('');
   console.log('Products: 20 (Artisanat, Alimentation, Vêtements, Maison, Electronique, Beauté, Bébé)');
   console.log('Translations: 26 English-Kinyarwanda pairs');

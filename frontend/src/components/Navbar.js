@@ -18,8 +18,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2 text-xl font-bold tracking-tight">
-            <FiPackage className="text-2xl" />
-            <span>KiKUU Rwanda</span>
+            <FiPackage className="text-2xl text-emerald-200" />
+            <span>Kiramart Rwanda</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -52,16 +52,16 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-emerald-800 px-4 pb-4 space-y-2">
-          <Link to="/" className="block py-2" onClick={() => setOpen(false)}><FiHome className="inline mr-2" />Home</Link>
-          <Link to="/products" className="block py-2" onClick={() => setOpen(false)}><FiShoppingCart className="inline mr-2" />Products</Link>
+        <div className="md:hidden bg-emerald-800 px-4 pb-4 space-y-2 border-t border-emerald-600/30">
+          <Link to="/" className="block py-2.5 hover:text-emerald-200 transition" onClick={() => setOpen(false)}><FiHome className="inline mr-2" />Home</Link>
+          <Link to="/products" className="block py-2.5 hover:text-emerald-200 transition" onClick={() => setOpen(false)}><FiShoppingCart className="inline mr-2" />Products</Link>
           {user ? (
             <>
-              <Link to="/profile" className="block py-2" onClick={() => setOpen(false)}><FiUser className="inline mr-2" />Profile</Link>
-              <button onClick={() => { handleLogout(); setOpen(false); }} className="block py-2 w-full text-left"><FiLogOut className="inline mr-2" />Logout</button>
+              <Link to="/profile" className="block py-2.5 hover:text-emerald-200 transition" onClick={() => setOpen(false)}><FiUser className="inline mr-2" />Profile</Link>
+              <button onClick={() => { handleLogout(); setOpen(false); }} className="block py-2.5 w-full text-left hover:text-emerald-200 transition"><FiLogOut className="inline mr-2" />Logout</button>
             </>
           ) : (
-            <Link to="/login" className="block py-2" onClick={() => setOpen(false)}><FiUser className="inline mr-2" />Sign In</Link>
+            <Link to="/login" className="block py-2.5 hover:text-emerald-200 transition" onClick={() => setOpen(false)}><FiUser className="inline mr-2" />Sign In</Link>
           )}
         </div>
       )}

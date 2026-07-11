@@ -146,7 +146,7 @@ class AdminService {
       totalBehaviorEvents: stats[2],
       totalTranslations: stats[3],
       totalPredictions: stats[4],
-      platform: 'KiKUU Rwanda',
+      platform: 'Kiramart Rwanda',
       middlewareVersion: '1.0.0',
     };
   }

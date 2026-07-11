@@ -19,7 +19,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customSiteTitle: 'KiKUU Rwanda - API Documentation',
+  customSiteTitle: 'Kiramart Rwanda - API Documentation',
   customCss: '.swagger-ui .topbar { display: none }',
   swaggerOptions: {
     persistAuthorization: true,

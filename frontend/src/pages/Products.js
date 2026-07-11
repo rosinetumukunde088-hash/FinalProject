@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { productService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 
@@ -47,17 +47,17 @@ export default function Products() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-500">{pagination.total} products available</p>
+          <p className="text-gray-500 mt-1">{pagination.total} products available</p>
         </div>
         <div className="flex gap-3">
-          <div className="relative">
+          <div className="relative w-full md:w-64">
             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search products..."
               value={search}
               onChange={(e) => updateParams({ search: e.target.value, page: '' })}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-full md:w-64"
+              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-full bg-white"
             />
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function Products() {
         <div className="flex flex-wrap gap-2 mb-8">
           <button
             onClick={() => updateParams({ category: '', page: '' })}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition ${!category ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition border ${!category ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
           >
             All
           </button>
@@ -75,7 +75,7 @@ export default function Products() {
             <button
               key={cat}
               onClick={() => updateParams({ category: cat === category ? '' : cat, page: '' })}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition ${category === cat ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition border ${category === cat ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
             >
               {cat}
             </button>
@@ -86,7 +86,7 @@ export default function Products() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse">
+            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse border border-gray-100">
               <div className="h-48 bg-gray-200" />
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-gray-200 rounded w-20" />
@@ -97,9 +97,9 @@ export default function Products() {
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-gray-500 text-lg">No products found.</p>
-          <Link to="/products" className="text-emerald-600 hover:underline mt-2 inline-block">Clear filters</Link>
+        <div className="text-center py-20 bg-white rounded-xl shadow-md border border-gray-100">
+          <p className="text-gray-600 text-lg">No products found.</p>
+          <Link to="/products" className="text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block font-medium">Clear filters</Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
