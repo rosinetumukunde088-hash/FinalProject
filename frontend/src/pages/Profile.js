@@ -1,15 +1,17 @@
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { FiUser, FiMail, FiPhone, FiShield, FiClock } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 export default function Profile() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   if (!user) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <p className="text-gray-600">Please log in to view your profile.</p>
-        <Link to="/login" className="text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block font-medium">Sign In</Link>
+        <p className="text-gray-600">{t('profile.notLoggedIn')}</p>
+        <Link to="/login" className="text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-block font-medium">{t('auth.signIn')}</Link>
       </div>
     );
   }
@@ -28,27 +30,27 @@ export default function Profile() {
           <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
             user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700'
           }`}>
-            {user.role}
+            {user.role === 'ADMIN' ? t('auth.admin') : t('auth.user')}
           </span>
 
           <div className="mt-8 space-y-4">
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
               <FiMail className="text-emerald-500" />
-              <div><p className="text-xs text-gray-500 uppercase tracking-wide">Email</p><p className="font-medium text-gray-900">{user.email}</p></div>
+              <div><p className="text-xs text-gray-500 uppercase tracking-wide">{t('profile.email')}</p><p className="font-medium text-gray-900">{user.email}</p></div>
             </div>
             {user.phone && (
               <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <FiPhone className="text-emerald-500" />
-                <div><p className="text-xs text-gray-500 uppercase tracking-wide">Phone</p><p className="font-medium text-gray-900">{user.phone}</p></div>
+                <div><p className="text-xs text-gray-500 uppercase tracking-wide">{t('profile.phone')}</p><p className="font-medium text-gray-900">{user.phone}</p></div>
               </div>
             )}
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
               <FiShield className="text-emerald-500" />
-              <div><p className="text-xs text-gray-500 uppercase tracking-wide">User Category</p><p className="font-medium text-gray-900 capitalize">{user.category?.toLowerCase()}</p></div>
+              <div><p className="text-xs text-gray-500 uppercase tracking-wide">{t('profile.category')}</p><p className="font-medium text-gray-900 capitalize">{user.category?.toLowerCase()}</p></div>
             </div>
             <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
               <FiClock className="text-emerald-500" />
-              <div><p className="text-xs text-gray-500 uppercase tracking-wide">Member Since</p><p className="font-medium text-gray-900">{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div>
+              <div><p className="text-xs text-gray-500 uppercase tracking-wide">{t('profile.memberSince')}</p><p className="font-medium text-gray-900">{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div>
             </div>
           </div>
         </div>

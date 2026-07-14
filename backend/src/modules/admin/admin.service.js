@@ -117,9 +117,6 @@ class AdminService {
         where,
         skip,
         take,
-        include: {
-          adminId: false,
-        },
         orderBy: { createdAt: 'desc' },
       }),
       prisma.adminAction.count({ where }),

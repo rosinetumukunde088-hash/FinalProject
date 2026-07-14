@@ -35,17 +35,20 @@ model User {
 }
 
 model Product {
-  id          String          @id @default(uuid())
-  name        String
-  nameRw      String?
-  description String
+  id            String          @id @default(uuid())
+  name          String
+  nameRw        String?
+  nameSw        String?
+  description   String
   descriptionRw String?
-  price       Float
-  category    String
-  imageUrl    String?
-  stock       Int             @default(0)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  descriptionSw String?
+  price         Float
+  category      String
+  imageUrl      String?
+  images        String[]
+  stock         Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model UserBehavior {

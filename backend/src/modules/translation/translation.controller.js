@@ -8,7 +8,13 @@ class TranslationController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
       }
-      const result = await translationService.translate(req.body.text, req.body.context);
+      const { text, context, sourceLang, targetLang } = req.body;
+      const result = await translationService.translate(
+        text,
+        sourceLang || 'en',
+        targetLang || 'rw',
+        context
+      );
       res.json(result);
     } catch (error) {
       next(error);

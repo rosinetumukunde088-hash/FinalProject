@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 
 const getAPI = () => {
   const token = localStorage.getItem('token');
@@ -16,11 +15,16 @@ export const productService = {
 };
 
 export const translationService = {
-  translate: (text) => getAPI().post('/translations/translate', { text }).then((r) => r.data),
+  translate: (text, sourceLang = 'en', targetLang = 'rw', context) =>
+    getAPI().post('/translations/translate', { text, sourceLang, targetLang, context }).then((r) => r.data),
 };
 
 export const adaptationService = {
   getCurrent: () => getAPI().get('/adaptation').then((r) => r.data),
   analyze: () => getAPI().post('/adaptation/analyze').then((r) => r.data),
   override: (data) => getAPI().put('/adaptation/override', data).then((r) => r.data),
+};
+
+export const chatbotService = {
+  sendMessage: (message) => getAPI().post('/chatbot/send', { message }).then((r) => r.data),
 };

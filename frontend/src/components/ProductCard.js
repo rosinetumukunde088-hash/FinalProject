@@ -1,12 +1,39 @@
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight, FiPlus } from 'react-icons/fi';
+import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product }) {
+  const { addItem } = useCart();
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product, 1);
+  };
+
+  const image = product.images?.[0] || product.imageUrl;
+
   return (
-    <Link to={`/products/${product.id}`} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition group" style={{animation:'fadeIn 0.3s ease-out'}}>
-      <div className="h-48 bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/60 to-teal-100/40"></div>
-        <FiShoppingCart className="text-5xl text-emerald-400 group-hover:text-emerald-600 transition-colors relative z-10" />
+    <Link to={`/products/${product.id}`} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition group relative" style={{animation:'fadeIn 0.3s ease-out'}}>
+      <div className="h-48 relative overflow-hidden bg-gray-100">
+        {image ? (
+          <img
+            src={image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className={`${image ? 'hidden' : 'flex'} w-full h-full bg-gradient-to-br from-emerald-50 to-teal-100 items-center justify-center`}>
+          <span className="text-4xl text-emerald-300">📦</span>
+        </div>
+
+        <button onClick={handleAdd} className="product-card-add-btn" title="Add to cart">
+          <FiPlus size={16} />
+        </button>
       </div>
       <div className="p-4">
         <span className="inline-block text-xs font-semibold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">
