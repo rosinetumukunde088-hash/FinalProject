@@ -18,7 +18,8 @@ class ChatbotController {
       res.json({
         reply: response.text,
         link: response.link,
-        suggestions: response.suggestions || []
+        suggestions: response.suggestions || [],
+        action: response.action || null
       });
     } catch (error) {
       next(error);

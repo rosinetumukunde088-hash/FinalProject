@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiSearch, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { productService } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
@@ -52,15 +52,24 @@ export default function Products() {
           <p className="text-gray-500 mt-1">{pagination.total} {t('products.productsAvailable')}</p>
         </div>
         <div className="flex gap-3">
-          <div className="relative w-full md:w-64">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div className="products-search">
+            <span className="products-search-icon"><FiSearch size={18} /></span>
             <input
               type="text"
               placeholder={t('products.search')}
               value={search}
               onChange={(e) => updateParams({ search: e.target.value, page: '' })}
-              className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-full bg-white"
+              className="products-search-input"
             />
+            {search && (
+              <button
+                onClick={() => updateParams({ search: '', page: '' })}
+                className="products-search-clear"
+                title={t('products.clearFilters')}
+              >
+                <FiX size={16} />
+              </button>
+            )}
           </div>
         </div>
       </div>

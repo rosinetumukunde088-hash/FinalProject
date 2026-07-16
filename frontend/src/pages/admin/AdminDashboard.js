@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { FiUsers, FiPackage, FiActivity, FiBrain, FiBarChart2, FiClock } from 'react-icons/fi';
+import { FiUsers, FiPackage, FiActivity, FiCpu, FiBarChart2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
     { label: t('admin.totalUsers'), value: stats?.totalUsers ?? 0, icon: <FiUsers />, color: 'bg-blue-500', link: '/admin/users' },
     { label: t('admin.totalProducts'), value: stats?.totalProducts ?? 0, icon: <FiPackage />, color: 'bg-emerald-500', link: '/admin/products' },
     { label: t('admin.totalEvents'), value: stats?.totalBehaviorEvents ?? 0, icon: <FiActivity />, color: 'bg-amber-500' },
-    { label: t('admin.totalPredictions'), value: stats?.totalPredictions ?? 0, icon: <FiBrain />, color: 'bg-purple-500' },
+    { label: t('admin.totalPredictions'), value: stats?.totalPredictions ?? 0, icon: <FiCpu />, color: 'bg-purple-500' },
   ];
 
   const userStats = dashboard?.userStats;

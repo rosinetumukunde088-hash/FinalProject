@@ -4,7 +4,7 @@ const INTENTS = {
   greeting: {
     patterns: [/^(hi|hello|hey|muraho|habari|good\s*(morning|afternoon|evening)|jambo)/i],
     response: {
-      text: "Hello! Welcome to Kiramart Rwanda. I'm here to help you find products, navigate the store, or answer any questions. What can I help you with?",
+      text: "Hello! Welcome to Kiramart Rwanda. I'm here to help you find products, simplify the interface, navigate the store, or answer any questions. What can I help you with?",
       link: null,
       suggestions: ["Browse products", "Help me find something", "About Kiramart"]
     }
@@ -34,7 +34,7 @@ const INTENTS = {
     }
   },
   account: {
-    patterns: [/account/i, /login/i, /sign\s*in/i, /register/i, /sign\s*up/i, /profile/i, /account/i],
+    patterns: [/account/i, /login/i, /sign\s*in/i, /register/i, /sign\s*up/i, /profile/i],
     response: {
       text: "You can sign in to access your account, or register if you're new to Kiramart Rwanda.",
       link: { text: "Sign In", path: "/login" },
@@ -63,6 +63,14 @@ const INTENTS = {
       text: "I can help you with:\n- Finding products and categories\n- Navigating the store\n- Managing your cart\n- Account registration and login\n- Understanding Kiramart features\n\nJust ask me anything!",
       link: null,
       suggestions: ["Browse products", "About Kiramart", "View cart"]
+    }
+  },
+  adaptation: {
+    patterns: [/simplif|easy|larger|contrast|interface|layout|adapt/i],
+    response: {
+      text: "I can help you make the interface easier to use. Tell me whether you prefer larger buttons, simpler menus, more contrast, or more guidance and I will point you to the right experience.",
+      link: { text: "Go to Home", path: "/" },
+      suggestions: ["Show me products", "Open my cart", "Help me sign in"]
     }
   },
   kinyarwanda: {
@@ -153,34 +161,143 @@ const FALLBACK_RESPONSE = {
   suggestions: ["Browse products", "Help me find something", "About Kiramart"]
 };
 
+const LANGUAGE_NAMES = {
+  en: ['english', 'icyongereza', 'kiingereza'],
+  rw: ['kinyarwanda', 'ikinyarwanda'],
+  sw: ['kiswahili', 'swahili'],
+};
+
+const SWITCH_VERBS = /\b(change|switch|set|hindura|hindukanya|badilisha|geuza)\b/i;
+const IN_LANGUAGE_PATTERN = /\b(in|to)\s+(english|kinyarwanda|ikinyarwanda|icyongereza|kiingereza|kiswahili|swahili)\b/i;
+
+const LANGUAGE_SWITCH_RESPONSES = {
+  en: {
+    text: "Done! I've switched the whole system to English.",
+    suggestions: ["Browse products", "View cart", "Help"],
+  },
+  rw: {
+    text: "Byakozwe! Nahinduye ururimi rw'ikoranabuhanga ryose mu Kinyarwanda.",
+    suggestions: ["Reba ibicuruzwa", "Reba igikapu", "Ubufasha"],
+  },
+  sw: {
+    text: "Nimefanya! Nimebadilisha lugha ya mfumo mzima kuwa Kiswahili.",
+    suggestions: ["Tazama bidhaa", "Tazama kikapu", "Msaada"],
+  },
+};
+
+function detectLanguageSwitch(message) {
+  const normalized = message.trim().toLowerCase();
+
+  if (!SWITCH_VERBS.test(normalized) && !IN_LANGUAGE_PATTERN.test(normalized)) {
+    return null;
+  }
+
+  for (const [code, names] of Object.entries(LANGUAGE_NAMES)) {
+    if (names.some((name) => normalized.includes(name))) {
+      return code;
+    }
+  }
+
+  return null;
+}
+
 function matchIntent(message) {
   const normalized = message.trim().toLowerCase();
-  
-  for (const [intent, config] of Object.entries(INTENTS)) {
+
+  for (const [, config] of Object.entries(INTENTS)) {
     for (const pattern of config.patterns) {
       if (pattern.test(normalized)) {
         return config.response;
       }
     }
   }
-  
+
   return FALLBACK_RESPONSE;
+}
+
+function inferRoute(message) {
+  const normalized = message.trim().toLowerCase();
+
+  if (/cart|basket|checkout|order|buy/i.test(normalized)) {
+    return { path: '/cart', label: 'Open cart', suggestion: 'View cart' };
+  }
+  if (/product|shop|browse|catalog|store|search/i.test(normalized)) {
+    return { path: '/products', label: 'Open products', suggestion: 'Browse products' };
+  }
+  if (/profile|account|sign in|login|register|create account/i.test(normalized)) {
+    return { path: '/login', label: 'Open login', suggestion: 'Sign in' };
+  }
+  if (/admin|dashboard|manage/i.test(normalized)) {
+    return { path: '/admin', label: 'Open admin', suggestion: 'Go to admin' };
+  }
+  if (/home|welcome|start/i.test(normalized)) {
+    return { path: '/', label: 'Go home', suggestion: 'Go to home' };
+  }
+  return null;
+}
+
+async function askGroq(message) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are Kiramart AI, a helpful assistant for an e-commerce app in Rwanda. Help users browse products, understand the system, and simplify the interface. Keep replies concise and useful. If the user asks for an action, mention the most relevant page in one short sentence.'
+          },
+          { role: 'user', content: message }
+        ],
+        temperature: 0.7,
+        max_tokens: 220,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Groq error ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch (error) {
+    return null;
+  }
 }
 
 class ChatbotService {
   async getResponse(message) {
+    const langSwitch = detectLanguageSwitch(message);
+    if (langSwitch) {
+      const langResponse = LANGUAGE_SWITCH_RESPONSES[langSwitch];
+      return {
+        text: langResponse.text,
+        link: null,
+        suggestions: langResponse.suggestions,
+        action: { type: 'setLanguage', lang: langSwitch },
+      };
+    }
+
     const response = matchIntent(message);
-    
+    const route = inferRoute(message);
     let contextualAddition = '';
-    
+    let finalText = response.text;
+
     try {
       const productCount = await prisma.product.count();
       const categories = await prisma.product.findMany({
         distinct: ['category'],
         select: { category: true }
       });
-      const categoryNames = categories.map(c => c.category).join(', ');
-      
+      const categoryNames = categories.map((c) => c.category).join(', ');
+
       if (response === FALLBACK_RESPONSE || /product/i.test(message)) {
         contextualAddition = `\n\nWe currently have ${productCount} products available across categories: ${categoryNames}.`;
       }
@@ -188,9 +305,19 @@ class ChatbotService {
       // Database not available, continue without context
     }
 
+    const groqReply = await askGroq(message);
+    if (groqReply) {
+      finalText = groqReply;
+    }
+
+    const link = route ? { text: route.label, path: route.path } : response.link;
+    const suggestions = [...new Set([...(route ? [route.suggestion] : []), ...(response.suggestions || [])])];
+
     return {
-      ...response,
-      text: response.text + contextualAddition
+      text: `${finalText}${contextualAddition}`.trim(),
+      link,
+      suggestions: suggestions.slice(0, 4),
+      action: null,
     };
   }
 }

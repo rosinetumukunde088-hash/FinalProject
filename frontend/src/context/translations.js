@@ -10,7 +10,7 @@ const translations = {
       admin: 'Admin',
     },
     home: {
-      heroTitle1: 'Murakaza neza kuri',
+      heroTitle1: 'Welcome to',
       heroTitle2: 'Kiramart Rwanda',
       heroDesc: 'AI-powered e-commerce platform with adaptive UI, Kinyarwanda language support, and personalized shopping experience for every Rwandan user.',
       shopNow: 'Shop Now',
@@ -62,6 +62,9 @@ const translations = {
       signInToCheckout: 'Sign In to Checkout',
       signInDesc: 'Create an account to complete your purchase',
       continueShopping: 'Continue Shopping',
+      increase: 'Increase quantity',
+      decrease: 'Decrease quantity',
+      maxStock: 'Max stock reached',
     },
     auth: {
       loginTitle: 'Welcome Back',
@@ -195,6 +198,7 @@ const translations = {
       title: 'Kiramart Assistant',
       status: 'Online | Kinyarwanda supported',
       placeholder: 'Type a message...',
+      toggle: 'Chat with AI',
     },
   },
   rw: {
@@ -260,6 +264,9 @@ const translations = {
       signInToCheckout: 'Injira Kugura',
       signInDesc: 'Fungura konti kugira ngo uze urigeze',
       continueShopping: 'Komeza Ucuruze',
+      increase: 'Ongera umubare',
+      decrease: 'Gabanya umubare',
+      maxStock: 'Wageze ku bibitswe byose',
     },
     auth: {
       loginTitle: 'Murakaza Neza',
@@ -365,7 +372,7 @@ const translations = {
       create: 'Kurema',
       previous: 'Imbere',
       next: 'Inyuma',
-      confirmDelete: 'Urashaka kwegera ko urashaka kusiba iyi?",
+      confirmDelete: 'Urashaka kwegera ko urashaka kusiba iyi?',
       noProducts: 'Nta bicuruzwa bahishe',
       auditLogs: 'Amadosiye y\'Abuyobozi',
       auditLogsDesc: 'Kurinda ibikorwa vyose vy\'umuyobozi',
@@ -393,6 +400,7 @@ const translations = {
       title: 'Umufasha wa Kiramart',
       status: 'iri online | Ikinyarwanda rirashoboye',
       placeholder: 'Andika ubutumwa...',
+      toggle: 'Baza AI',
     },
   },
   sw: {
@@ -458,6 +466,9 @@ const translations = {
       signInToCheckout: 'Ingia Kulipa',
       signInDesc: 'Fungua akaunti ili kukamilisha ununuzi wako',
       continueShopping: 'Endelea Ununuzi',
+      increase: 'Ongeza idadi',
+      decrease: 'Punguza idadi',
+      maxStock: 'Umefikia kikomo cha hisa',
     },
     auth: {
       loginTitle: 'Karibu Tena',
@@ -591,6 +602,7 @@ const translations = {
       title: 'Msaidizi wa Kiramart',
       status: 'Mtandaoni | Kinyarwanda inapatikana',
       placeholder: 'Andika ujumbe...',
+      toggle: 'Uliza AI',
     },
   },
 };

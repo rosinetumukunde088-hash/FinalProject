@@ -7,13 +7,16 @@ import { FiTrash2, FiPlus, FiMinus, FiShoppingCart, FiArrowLeft, FiArrowRight } 
 export default function Cart() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCart();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+
+  const getDisplayName = (item) =>
+    (lang === 'rw' && item.nameRw) || (lang === 'sw' && item.nameSw) || item.name;
 
   if (items.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <div className="bg-white rounded-2xl shadow-lg p-12">
-          <FiShoppingCart className="text-6xl text-gray-300 mx-auto mb-6" />
+          <FiShoppingCart className="text-gray-300 mx-auto mb-6" size={64} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('cart.empty')}</h2>
           <p className="text-gray-500 mb-6">{t('cart.emptyDesc')}</p>
           <Link
@@ -29,74 +32,92 @@ export default function Cart() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="cart-header">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('cart.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('cart.title')}</h1>
           <p className="text-gray-500 mt-1">{items.length} {items.length === 1 ? t('cart.itemInCart') : t('cart.itemsInCart')}</p>
         </div>
-        <button
-          onClick={clearCart}
-          className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center space-x-1 transition-colors"
-        >
+        <button onClick={clearCart} className="cart-header-clear">
           <FiTrash2 /><span>{t('cart.clearCart')}</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="cart-layout">
+        <div className="cart-items">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow-md p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-4 border border-gray-100">
-              <div className="flex-shrink-0 w-full md:w-24 h-24 bg-gradient-to-br from-emerald-50 to-teal-100 rounded-lg flex items-center justify-center">
-                <FiShoppingCart className="text-3xl text-emerald-300" />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <Link to={`/products/${item.id}`} className="font-semibold text-gray-900 hover:text-emerald-600 transition-colors line-clamp-1">
-                  {item.name}
+            <div key={item.id} className="cart-item">
+              <div className="cart-item-main">
+                <Link to={`/products/${item.id}`} className="cart-item-thumb">
+                  {(item.images?.[0] || item.imageUrl) ? (
+                    <img
+                      src={item.images?.[0] || item.imageUrl}
+                      alt={getDisplayName(item)}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className="cart-item-fallback" style={{ display: (item.images?.[0] || item.imageUrl) ? 'none' : 'flex' }}>
+                    <span className="text-3xl text-emerald-300">📦</span>
+                  </div>
                 </Link>
-                {item.nameRw && (
-                  <p className="text-sm text-gray-500 italic">{item.nameRw}</p>
-                )}
-                <p className="text-sm text-gray-500 mt-1">{item.category}</p>
+
+                <div className="cart-item-info">
+                  <Link to={`/products/${item.id}`} className="font-semibold text-gray-900 hover:text-emerald-600 transition-colors line-clamp-1">
+                    {getDisplayName(item)}
+                  </Link>
+                  <p className="text-sm text-gray-500 mt-1">{item.category}</p>
+                </div>
               </div>
 
-              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden flex-shrink-0">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="px-3 py-2 hover:bg-gray-100 transition border-r border-gray-300"
-                >
-                  <FiMinus size={14} />
-                </button>
-                <span className="px-4 py-2 font-semibold text-gray-900 min-w-[3rem] text-center">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, Math.min((item.stock || 99), item.quantity + 1))}
-                  className="px-3 py-2 hover:bg-gray-100 transition border-l border-gray-300"
-                  disabled={item.quantity >= (item.stock || 99)}
-                >
-                  <FiPlus size={14} />
-                </button>
-              </div>
+              <div className="cart-item-controls">
+                <div className="cart-item-qty">
+                  <div className="cart-item-qty-stepper">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      title={t('cart.decrease')}
+                    >
+                      <FiMinus size={14} />
+                    </button>
+                    <span className="cart-item-qty-value">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, Math.min((item.stock || 99), item.quantity + 1))}
+                      disabled={item.quantity >= (item.stock || 99)}
+                      title={t('cart.increase')}
+                    >
+                      <FiPlus size={14} />
+                    </button>
+                  </div>
+                  {item.stock > 0 && item.quantity >= item.stock && (
+                    <span className="cart-item-max-stock">{t('cart.maxStock')}</span>
+                  )}
+                </div>
 
-              <div className="flex items-center justify-between md:flex-col md:items-end gap-2 flex-shrink-0">
-                <p className="text-lg font-bold text-emerald-700">
-                  {(item.price * item.quantity).toLocaleString()} <span className="text-sm font-medium text-gray-500">RWF</span>
-                </p>
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="text-red-500 hover:text-red-700 transition-colors p-1"
-                  title="Remove item"
-                >
-                  <FiTrash2 size={18} />
-                </button>
+                <div className="cart-item-price-row">
+                  <p className="cart-item-price">
+                    {(item.price * item.quantity).toLocaleString()} <span className="text-sm font-medium text-gray-500">RWF</span>
+                  </p>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="cart-item-remove"
+                    title="Remove item"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 sticky top-24">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('cart.orderSummary')}</h2>
-            
+        <div className="cart-summary-col">
+          <div className="cart-summary-card">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+              <FiShoppingCart className="text-emerald-600" />
+              <span>{t('cart.orderSummary')}</span>
+            </h2>
+
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">{t('cart.subtotal')} ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>

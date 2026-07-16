@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
 import { chatbotService } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const INITIAL_MESSAGES = [
   {
     role: 'bot',
-    text: "Hello! I'm the Kiramart assistant. I can help you find products, navigate the store, or answer any questions. How can I help you today?",
-    suggestions: ["Browse products", "Help me find something", "About Kiramart"],
+    text: "Hello! I'm your Kiramart AI assistant. I can help you browse products, simplify the interface, open the right pages, and answer anything you need from the system. What would you like to do?",
+    suggestions: ["Browse products", "Simplify the interface", "Open my cart", "Help me get started"],
     link: null
   }
 ];
@@ -30,6 +31,7 @@ function parseTextWithLinks(text, onNavigate) {
 
 export default function Chatbot() {
   const navigate = useNavigate();
+  const { t, switchLang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
@@ -64,6 +66,11 @@ export default function Chatbot() {
 
     try {
       const response = await chatbotService.sendMessage(text);
+
+      if (response.action?.type === 'setLanguage') {
+        switchLang(response.action.lang);
+      }
+
       const botMessage = {
         role: 'bot',
         text: response.reply,
@@ -100,9 +107,9 @@ export default function Chatbot() {
       <button
         className="chatbot-toggle"
         onClick={() => setIsOpen(!isOpen)}
-        title="Chat with us"
+        title={t('chatbot.toggle')}
       >
-        {isOpen ? <FiX size={24} /> : <FiMessageCircle size={24} />}
+        {isOpen ? <FiX size={24} /> : <><FiMessageCircle size={20} /><span className="ml-2 font-semibold">{t('chatbot.toggle')}</span></>}
       </button>
 
       {isOpen && (
@@ -113,8 +120,8 @@ export default function Chatbot() {
                 <FiMessageCircle size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">Kiramart Assistant</h3>
-                <p className="text-emerald-200 text-xs">Online | Kinyarwanda supported</p>
+                <h3 className="font-semibold text-sm">Kiramart AI Assistant</h3>
+                <p className="text-emerald-200 text-xs">Online | full system help</p>
               </div>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-emerald-600/30 rounded-lg transition">
@@ -186,7 +193,7 @@ export default function Chatbot() {
               ref={inputRef}
               type="text"
               className="chatbot-input"
-              placeholder="Type a message..."
+              placeholder="Tell me what you want to do..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}

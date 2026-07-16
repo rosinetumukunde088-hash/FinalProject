@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { FiChevronRight, FiPlus } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
+  const { t, lang } = useLanguage();
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -12,6 +14,10 @@ export default function ProductCard({ product }) {
   };
 
   const image = product.images?.[0] || product.imageUrl;
+  const displayName =
+    (lang === 'rw' && product.nameRw) ||
+    (lang === 'sw' && product.nameSw) ||
+    product.name;
 
   return (
     <Link to={`/products/${product.id}`} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition group relative" style={{animation:'fadeIn 0.3s ease-out'}}>
@@ -31,7 +37,7 @@ export default function ProductCard({ product }) {
           <span className="text-4xl text-emerald-300">📦</span>
         </div>
 
-        <button onClick={handleAdd} className="product-card-add-btn" title="Add to cart">
+        <button onClick={handleAdd} className="product-card-add-btn" title={t('product.addToCart')}>
           <FiPlus size={16} />
         </button>
       </div>
@@ -40,11 +46,8 @@ export default function ProductCard({ product }) {
           {product.category}
         </span>
         <h3 className="mt-2 font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2">
-          {product.name}
+          {displayName}
         </h3>
-        {product.nameRw && (
-          <p className="text-sm text-gray-500 italic mt-0.5">{product.nameRw}</p>
-        )}
         <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
           <span className="text-lg font-bold text-emerald-700">
             {product.price.toLocaleString()} <span className="text-sm font-medium text-gray-500">RWF</span>
