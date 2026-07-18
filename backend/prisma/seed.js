@@ -81,8 +81,8 @@ async function main() {
     where: { email: 'admin@kiramart.rw' },
     update: {},
     create: {
-      name: 'Alice Uwimana',
-      email: 'admin@kiramart.rw',
+      name: 'tumukunde rosine',
+      email: 'rosinetumukunde08@gmail.com',
       password: adminPassword,
       role: 'ADMIN',
       phone: '+250788300001',
