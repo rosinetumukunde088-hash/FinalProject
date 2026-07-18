@@ -1,7 +1,28 @@
+const bcrypt = require('bcryptjs');
 const { prisma } = require('../../config/db');
 const { paginate } = require('../../utils/helpers');
 
 class AdminService {
+  async createUser({ name, email, password, phone, role }) {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      throw Object.assign(new Error('Email already registered'), { statusCode: 409 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        phone,
+        role: ['ADMIN', 'TRADER', 'MANAGER'].includes(role) ? role : 'USER',
+      },
+      select: { id: true, name: true, email: true, role: true, category: true, phone: true, isActive: true, createdAt: true },
+    });
+    return user;
+  }
+
   async getAllUsers(query) {
     const { skip, take, page, limit } = paginate(query.page, query.limit);
     const where = {};
@@ -21,6 +42,10 @@ class AdminService {
       where.role = query.role;
     }
 
+    if (query.isActive !== undefined && query.isActive !== '') {
+      where.isActive = query.isActive === 'true';
+    }
+
     const [users, total] = await Promise.all([
       prisma.user.findMany({
         where,
@@ -33,6 +58,7 @@ class AdminService {
           role: true,
           category: true,
           phone: true,
+          isActive: true,
           createdAt: true,
           _count: { select: { behaviors: true } },
         },
@@ -52,7 +78,7 @@ class AdminService {
       where: { id: userId },
       select: {
         id: true, name: true, email: true, role: true, category: true,
-        phone: true, createdAt: true, updatedAt: true,
+        phone: true, isActive: true, createdAt: true, updatedAt: true,
         _count: { select: { behaviors: true, adaptations: true } },
       },
     });
@@ -91,6 +117,19 @@ class AdminService {
       where: { id: userId },
       data: { role },
       select: { id: true, name: true, email: true, role: true, category: true },
+    });
+  }
+
+  async updateUserStatus(userId, isActive) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw Object.assign(new Error('User not found'), { statusCode: 404 });
+    }
+
+    return prisma.user.update({
+      where: { id: userId },
+      data: { isActive },
+      select: { id: true, name: true, email: true, role: true, category: true, isActive: true },
     });
   }
 

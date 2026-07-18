@@ -37,6 +37,15 @@ class ReportingController {
     }
   }
 
+  async getSalesStats(req, res, next) {
+    try {
+      const stats = await reportingService.getSalesStats(req.query);
+      res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getDashboardSummary(req, res, next) {
     try {
       const summary = await reportingService.getDashboardSummary();

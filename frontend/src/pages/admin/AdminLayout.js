@@ -1,72 +1,105 @@
-import { Link, useLocation, Outlet, Navigate } from 'react-router-dom';
+import { Link, useLocation, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { FiGrid, FiUsers, FiPackage, FiFileText, FiArrowLeft } from 'react-icons/fi';
+import { FiGrid, FiUsers, FiPackage, FiTag, FiFileText, FiArrowLeft, FiLogOut, FiBox, FiSettings, FiBarChart2, FiClipboard, FiPieChart } from 'react-icons/fi';
+import AdminTopbar from './AdminTopbar';
 
 export default function AdminLayout() {
-  const { user } = useAuth();
-  const { t } = useLanguage();
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   if (!user || user.role !== 'ADMIN') {
     return <Navigate to="/" replace />;
   }
 
-  const links = [
-    { to: '/admin', icon: <FiGrid />, label: t('admin.dashboard'), exact: true },
-    { to: '/admin/users', icon: <FiUsers />, label: t('admin.users') },
-    { to: '/admin/products', icon: <FiPackage />, label: t('admin.products') },
-    { to: '/admin/logs', icon: <FiFileText />, label: t('admin.logs') },
+  const mainLinks = [
+    { to: '/admin', icon: <FiGrid />, label: 'Dashboard', exact: true },
+    { to: '/admin/analytics', icon: <FiBarChart2 />, label: 'Analytics' },
+    { to: '/admin/users', icon: <FiUsers />, label: 'Users' },
+    { to: '/admin/products', icon: <FiPackage />, label: 'Products' },
+    { to: '/admin/orders', icon: <FiClipboard />, label: 'Orders' },
+    { to: '/admin/categories', icon: <FiTag />, label: 'Categories' },
+    { to: '/admin/reports', icon: <FiPieChart />, label: 'Reports' },
   ];
+  const otherLinks = [
+    { to: '/admin/logs', icon: <FiFileText />, label: 'Audit Logs' },
+    { to: '/admin/settings', icon: <FiSettings />, label: 'Settings' },
+  ];
+  const allLinks = [...mainLinks, ...otherLinks];
 
   const isActive = (link) =>
     link.exact ? location.pathname === link.to : location.pathname.startsWith(link.to);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const initial = (user.name || 'A').trim().charAt(0).toUpperCase();
+
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:block">
-        <div className="p-6">
-          <h2 className="text-lg font-bold text-gray-900">{t('admin.panel')}</h2>
-          <p className="text-xs text-gray-500 mt-1">{t('admin.panelDesc')}</p>
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-logo">
+          <div className="admin-sidebar-logo-icon"><FiBox /></div>
+          <div>
+            <div className="admin-sidebar-logo-title">Kiramart</div>
+            <div className="admin-sidebar-logo-sub">Admin Panel</div>
+          </div>
         </div>
-        <nav className="px-3 space-y-1">
-          {links.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-                isActive(link)
-                  ? 'bg-purple-50 text-purple-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <span className="text-lg">{link.icon}</span>
-              <span>{link.label}</span>
-            </Link>
-          ))}
-        </nav>
-        <div className="p-3 mt-4 border-t border-gray-200">
-          <Link
-            to="/"
-            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
-          >
-            <FiArrowLeft />
-            <span>{t('admin.backToStore')}</span>
+
+        <div className="admin-nav-group">
+          <p className="admin-nav-label">Main Menu</p>
+          <nav>
+            {mainLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`admin-nav-item ${isActive(link) ? 'active' : ''}`}
+              >
+                <span className="admin-nav-icon">{link.icon}</span>
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="admin-nav-group">
+          <p className="admin-nav-label">Other</p>
+          <nav>
+            {otherLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`admin-nav-item ${isActive(link) ? 'active' : ''}`}
+              >
+                <span className="admin-nav-icon">{link.icon}</span>
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="admin-sidebar-footer">
+          <Link to="/" className="admin-nav-item">
+            <span className="admin-nav-icon"><FiArrowLeft /></span>
+            <span>Back to Store</span>
           </Link>
+          <button onClick={handleLogout} className="admin-nav-item" style={{ width: '100%', textAlign: 'left' }}>
+            <span className="admin-nav-icon"><FiLogOut /></span>
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 
-      <div className="flex-1 p-6 md:p-8 bg-gray-50 overflow-auto">
-        <div className="md:hidden mb-6 flex space-x-2 overflow-x-auto pb-2">
-          {links.map((link) => (
+      <div className="admin-content">
+        <AdminTopbar />
+        <div className="admin-mobile-nav">
+          {allLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
-                isActive(link)
-                  ? 'bg-purple-50 text-purple-700'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`admin-mobile-nav-item ${isActive(link) ? 'active' : ''}`}
             >
               {link.icon}
               <span>{link.label}</span>

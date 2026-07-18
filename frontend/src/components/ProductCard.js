@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -36,13 +36,9 @@ export default function ProductCard({ product }) {
         <div className={`${image ? 'hidden' : 'flex'} w-full h-full bg-gradient-to-br from-emerald-50 to-teal-100 items-center justify-center`}>
           <span className="text-4xl text-emerald-300">📦</span>
         </div>
-
-        <button onClick={handleAdd} className="product-card-add-btn" title={t('product.addToCart')}>
-          <FiPlus size={16} />
-        </button>
       </div>
-      <div className="p-4">
-        <span className="inline-block text-xs font-semibold bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full">
+      <div className="px-4 pb-4 pt-2">
+        <span className="inline-block text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
           {product.category}
         </span>
         <h3 className="mt-2 font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2">
@@ -52,9 +48,9 @@ export default function ProductCard({ product }) {
           <span className="text-lg font-bold text-emerald-700">
             {product.price.toLocaleString()} <span className="text-sm font-medium text-gray-500">RWF</span>
           </span>
-          <span className="text-emerald-500 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
-            <FiChevronRight size={20} />
-          </span>
+          <button onClick={handleAdd} className="product-card-add-btn" title={t('product.addToCart')}>
+            <FiPlus size={16} />
+          </button>
         </div>
       </div>
     </Link>

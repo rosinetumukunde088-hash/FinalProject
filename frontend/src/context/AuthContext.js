@@ -59,9 +59,13 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     const { data } = await API.post('/auth/register', userData);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setUser(data.user);
+    // A self-registered trader comes back pending approval with no token —
+    // don't log them in until an admin activates the account.
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+    }
     return data;
   };
 
@@ -71,8 +75,33 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateProfile = async (profileData) => {
+    const { data } = await API.put('/auth/profile', profileData);
+    setUser(data);
+    localStorage.setItem('user', JSON.stringify(data));
+    return data;
+  };
+
+  const changePassword = async (passwordData) => {
+    const { data } = await API.put('/auth/change-password', passwordData);
+    return data;
+  };
+
+  const forgotPassword = async (email) => {
+    const { data } = await API.post('/auth/forgot-password', { email });
+    return data;
+  };
+
+  const resetPassword = async (token, password) => {
+    const { data } = await API.post(`/auth/reset-password/${token}`, { password });
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, API }}>
+    <AuthContext.Provider value={{
+      user, loading, login, register, logout, API,
+      updateProfile, changePassword, forgotPassword, resetPassword,
+    }}>
       {children}
     </AuthContext.Provider>
   );

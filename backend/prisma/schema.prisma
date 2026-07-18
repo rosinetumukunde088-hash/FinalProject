@@ -8,12 +8,19 @@ datasource db {
 enum UserRole {
   USER
   ADMIN
+  TRADER
+  MANAGER
 }
 
 enum UserCategory {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+enum OrderStatus {
+  PAID
+  CANCELLED
 }
 
 model User {
@@ -23,12 +30,25 @@ model User {
   password      String
   role          UserRole        @default(USER)
   category      UserCategory    @default(BEGINNER)
+  isActive      Boolean         @default(true)
   phone         String?
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
   behaviors     UserBehavior[]
   adaptations   Adaptation[]
+  orders        Order[]
+  products      Product[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  nameRw    String?
+  nameSw    String?
+  createdAt DateTime @default(now())
 }
 
 model Product {
@@ -44,8 +64,41 @@ model Product {
   imageUrl      String?
   images        String[]
   stock         Int             @default(0)
+  createdById   String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+
+  createdBy     User?           @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([createdById])
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  userId        String
+  total         Float
+  paymentMethod String
+  status        OrderStatus @default(PAID)
+  createdAt     DateTime    @default(now())
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String?
+  name      String
+  imageUrl  String?
+  price     Float
+  quantity  Int
+
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
 }
 
 model UserBehavior {

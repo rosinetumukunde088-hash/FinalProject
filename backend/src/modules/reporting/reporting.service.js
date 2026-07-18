@@ -142,6 +142,55 @@ class ReportingService {
     };
   }
 
+  async getSalesStats(query) {
+    const days = parseInt(query.days) || 30;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const orders = await prisma.order.findMany({
+      where: { createdAt: { gte: since }, status: 'PAID' },
+      include: { items: true },
+    });
+
+    if (orders.length === 0) {
+      return { totalRevenue: 0, totalOrders: 0, dailyTrend: [], topProducts: [], byPaymentMethod: [] };
+    }
+
+    const dailyMap = {};
+    const productMap = {};
+    const paymentMap = {};
+
+    orders.forEach((order) => {
+      const day = order.createdAt.toISOString().split('T')[0];
+      dailyMap[day] = (dailyMap[day] || 0) + order.total;
+      paymentMap[order.paymentMethod] = (paymentMap[order.paymentMethod] || 0) + 1;
+
+      order.items.forEach((item) => {
+        productMap[item.name] = (productMap[item.name] || 0) + item.quantity;
+      });
+    });
+
+    const dailyTrend = Object.entries(dailyMap)
+      .map(([date, total]) => ({ date, total: Math.round(total * 100) / 100 }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const topProducts = Object.entries(productMap)
+      .map(([name, quantity]) => ({ name, quantity }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 10);
+
+    const byPaymentMethod = Object.entries(paymentMap)
+      .map(([method, count]) => ({ method, count }))
+      .sort((a, b) => b.count - a.count);
+
+    return {
+      totalRevenue: Math.round(orders.reduce((s, o) => s + o.total, 0) * 100) / 100,
+      totalOrders: orders.length,
+      dailyTrend,
+      topProducts,
+      byPaymentMethod,
+    };
+  }
+
   async getDashboardSummary() {
     const [userStats, behaviorStats, adaptationStats, productStats] = await Promise.all([
       this.getUserStats(),

@@ -4,6 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
+const getHomeRoute = (role) => {
+  if (role === 'ADMIN') return '/admin';
+  if (role === 'TRADER') return '/trader';
+  if (role === 'MANAGER') return '/manager';
+  return '/';
+};
+
 export default function Login() {
   const { login, user } = useAuth();
   const { t } = useLanguage();
@@ -14,15 +21,15 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  if (user) { navigate('/'); return null; }
+  if (user) { navigate(getHomeRoute(user.role)); return null; }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const data = await login(email, password);
+      navigate(getHomeRoute(data.user?.role));
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -60,7 +67,12 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.password')}</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">{t('auth.password')}</label>
+                <Link to="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700 hover:underline font-medium">
+                  {t('auth.forgotPassword')}
+                </Link>
+              </div>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
@@ -86,13 +98,10 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>{t('auth.testAccounts')}: admin@kiramart.rw / admin123</p>
-            <p>{t('auth.user')}: habimana@kiramart.rw / user123</p>
-            <Link to="/register" className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium mt-2 inline-block">
-              {t('auth.noAccount')} {t('auth.register')}
-            </Link>
-          </div>
+          <p className="mt-6 text-center text-sm text-gray-500">
+            {t('auth.noAccount')}{' '}
+            <Link to="/register" className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium">{t('auth.register')}</Link>
+          </p>
         </div>
       </div>
     </div>

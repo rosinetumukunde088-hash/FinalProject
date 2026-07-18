@@ -73,7 +73,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
     { name: 'AI Engine', description: 'AI prediction and user classification. Requires authentication. Users can only predict and view their own classification.' },
     { name: 'Reports', description: 'Administrative analytics and reporting. All report endpoints require ADMIN role.' },
     { name: 'Admin', description: 'User management and system administration. All admin endpoints require ADMIN role.' },
-    { name: 'Upload', description: 'File upload to Cloudinary (images and audio). Requires ADMIN role.' },
+    { name: 'Upload', description: 'File upload to local storage (images and audio). Requires ADMIN role.' },
     { name: 'System', description: 'Health check and system status. Public endpoint, no authentication required.' },
   ],
   components: {
@@ -449,8 +449,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
       UploadResponse: {
         type: 'object',
         properties: {
-          url: { type: 'string', example: 'https://res.cloudinary.com/demo/image/upload/v1234567890/kiramart_products/abc.jpg' },
-          publicId: { type: 'string', example: 'kiramart_products/abc123' },
+          url: { type: 'string', example: '/uploads/1737200000000-a1b2c3d4e5f6g7h8.jpg' },
         },
       },
       UserStatsReport: {
@@ -2189,7 +2188,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
       post: {
         tags: ['Upload'],
         summary: 'Upload product image (Admin)',
-        description: 'Uploads an image file to Cloudinary and returns the URL. Requires multipart/form-data with a field named "image". Accepted formats: JPEG, PNG, GIF, WebP.',
+        description: 'Uploads an image file to local storage and returns the URL. Requires multipart/form-data with a field named "image". Accepted formats: JPEG, PNG, GIF, WebP.',
         security: [{ BearerAuth: [] }],
         requestBody: {
           required: true,
@@ -2216,8 +2215,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
               'application/json': {
                 schema: { $ref: '#/components/schemas/UploadResponse' },
                 example: {
-                  url: 'https://res.cloudinary.com/demo/image/upload/v1234567890/kiramart_products/abc123.jpg',
-                  publicId: 'kiramart_products/abc123',
+                  url: '/uploads/1737200000000-a1b2c3d4e5f6g7h8.jpg',
                 },
               },
             },
@@ -2256,7 +2254,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
       post: {
         tags: ['Upload'],
         summary: 'Upload audio file (Admin)',
-        description: 'Uploads an audio file to Cloudinary and returns the URL. Requires multipart/form-data with a field named "audio". Accepted formats: MP3, WAV, OGG, M4A.',
+        description: 'Uploads an audio file to local storage and returns the URL. Requires multipart/form-data with a field named "audio". Accepted formats: MP3, WAV, OGG, M4A.',
         security: [{ BearerAuth: [] }],
         requestBody: {
           required: true,
@@ -2283,8 +2281,7 @@ Users can manually adjust their adaptation settings at any time via \`PUT /adapt
               'application/json': {
                 schema: { $ref: '#/components/schemas/UploadResponse' },
                 example: {
-                  url: 'https://res.cloudinary.com/demo/video/upload/v1234567890/kiramart_audio/def456.mp3',
-                  publicId: 'kiramart_audio/def456',
+                  url: '/uploads/1737200000000-b2c3d4e5f6g7h8i9.mp3',
                 },
               },
             },

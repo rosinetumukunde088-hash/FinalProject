@@ -11,7 +11,6 @@ const getAPI = () => {
 export const productService = {
   getAll: (params) => getAPI().get('/products', { params }).then((r) => r.data),
   getById: (id) => getAPI().get(`/products/${id}`).then((r) => r.data),
-  getCategories: () => getAPI().get('/products/categories').then((r) => r.data),
 };
 
 export const translationService = {
@@ -26,5 +25,14 @@ export const adaptationService = {
 };
 
 export const chatbotService = {
-  sendMessage: (message) => getAPI().post('/chatbot/send', { message }).then((r) => r.data),
+  sendMessage: (message, source = 'typed') => getAPI().post('/chatbot/send', { message, source }).then((r) => r.data),
+};
+
+export const orderService = {
+  create: (order) => getAPI().post('/orders', order).then((r) => r.data),
+  getMyOrders: (params) => getAPI().get('/orders', { params }).then((r) => r.data),
+};
+
+export const categoryService = {
+  getAll: () => getAPI().get('/categories').then((r) => r.data),
 };

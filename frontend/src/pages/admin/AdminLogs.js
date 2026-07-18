@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { FiFileText, FiChevronLeft, FiChevronRight, FiFilter } from 'react-icons/fi';
+import { FiFileText, FiChevronLeft, FiChevronRight, FiFilter, FiChevronDown } from 'react-icons/fi';
 
 export default function AdminLogs() {
   const { API } = useAuth();
-  const { t } = useLanguage();
   const [logs, setLogs] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [actionFilter, setActionFilter] = useState('');
@@ -36,22 +34,25 @@ export default function AdminLogs() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.auditLogs')}</h1>
-        <p className="text-gray-500 mt-1">{t('admin.auditLogsDesc')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
+        <p className="text-gray-500 mt-1">Track all admin actions on the platform</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center space-x-3">
             <FiFilter className="text-gray-400" />
-            <select
-              value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">{t('admin.allActions')}</option>
-              <option value="UPDATE_ROLE">UPDATE_ROLE</option>
-            </select>
+            <div className="admin-select-wrap">
+              <select
+                value={actionFilter}
+                onChange={(e) => setActionFilter(e.target.value)}
+                className="admin-select"
+              >
+                <option value="">All Actions</option>
+                <option value="UPDATE_ROLE">UPDATE_ROLE</option>
+              </select>
+              <span className="admin-select-arrow"><FiChevronDown size={14} /></span>
+            </div>
           </div>
         </div>
 
@@ -62,18 +63,18 @@ export default function AdminLogs() {
         ) : logs.length === 0 ? (
           <div className="py-12 text-center text-gray-500">
             <FiFileText className="mx-auto text-4xl text-gray-300 mb-3" />
-            {t('admin.noLogs')}
+            No audit logs found
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">{t('admin.timestamp')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">{t('admin.adminUser')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">{t('admin.action')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">{t('admin.target')}</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">{t('admin.details')}</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Timestamp</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Admin</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Action</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Target</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Details</th>
                 </tr>
               </thead>
               <tbody>
@@ -108,7 +109,7 @@ export default function AdminLogs() {
         {pagination.pages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <p className="text-sm text-gray-500">
-              Page {pagination.page} of {pagination.pages} ({pagination.total} {t('admin.totalEntries')})
+              Page {pagination.page} of {pagination.pages} ({pagination.total} entries)
             </p>
             <div className="flex items-center space-x-2">
               <button

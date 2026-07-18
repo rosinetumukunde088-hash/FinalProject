@@ -1,12 +1,11 @@
-const { uploadFromBuffer } = require('./upload.service');
+const UPLOADS_BASE_URL = process.env.UPLOADS_BASE_URL || '/uploads';
 
 const uploadImage = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file provided' });
     }
-    const result = await uploadFromBuffer(req.file.buffer, 'kiramart_products');
-    res.json({ url: result.secure_url, publicId: result.public_id });
+    res.json({ url: `${UPLOADS_BASE_URL}/${req.file.filename}` });
   } catch (error) {
     next(error);
   }
@@ -17,8 +16,7 @@ const uploadAudio = async (req, res, next) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file provided' });
     }
-    const result = await uploadFromBuffer(req.file.buffer, 'kiramart_audio');
-    res.json({ url: result.secure_url, publicId: result.public_id });
+    res.json({ url: `${UPLOADS_BASE_URL}/${req.file.filename}` });
   } catch (error) {
     next(error);
   }

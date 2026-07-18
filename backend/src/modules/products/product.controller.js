@@ -8,7 +8,7 @@ class ProductController {
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
       }
-      const product = await productService.create(req.body);
+      const product = await productService.create(req.body, req.user.id);
       res.status(201).json(product);
     } catch (error) {
       next(error);
@@ -18,6 +18,15 @@ class ProductController {
   async findAll(req, res, next) {
     try {
       const result = await productService.findAll(req.query);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async findMine(req, res, next) {
+    try {
+      const result = await productService.findAll({ ...req.query, ownerId: req.user.id });
       res.json(result);
     } catch (error) {
       next(error);
@@ -35,7 +44,7 @@ class ProductController {
 
   async update(req, res, next) {
     try {
-      const product = await productService.update(req.params.id, req.body);
+      const product = await productService.update(req.params.id, req.body, req.user);
       res.json(product);
     } catch (error) {
       next(error);
@@ -44,7 +53,7 @@ class ProductController {
 
   async delete(req, res, next) {
     try {
-      const result = await productService.delete(req.params.id);
+      const result = await productService.delete(req.params.id, req.user);
       res.json(result);
     } catch (error) {
       next(error);

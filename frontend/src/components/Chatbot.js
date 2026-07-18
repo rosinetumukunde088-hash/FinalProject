@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
 import { chatbotService } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { useVoiceGuide } from '../context/VoiceGuideContext';
 
 const INITIAL_MESSAGES = [
   {
@@ -32,6 +33,7 @@ function parseTextWithLinks(text, onNavigate) {
 export default function Chatbot() {
   const navigate = useNavigate();
   const { t, switchLang } = useLanguage();
+  const { speak } = useVoiceGuide();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
@@ -56,7 +58,7 @@ export default function Chatbot() {
     setIsOpen(false);
   };
 
-  const sendMessage = async (text) => {
+  const sendMessage = async (text, source = 'typed') => {
     if (!text.trim() || loading) return;
 
     const userMessage = { role: 'user', text: text.trim() };
@@ -65,7 +67,7 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      const response = await chatbotService.sendMessage(text);
+      const response = await chatbotService.sendMessage(text, source);
 
       if (response.action?.type === 'setLanguage') {
         switchLang(response.action.lang);
@@ -78,16 +80,19 @@ export default function Chatbot() {
         suggestions: response.suggestions || []
       };
       setMessages((prev) => [...prev, botMessage]);
+      speak(response.reply);
     } catch (error) {
+      const fallbackText = "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.";
       setMessages((prev) => [
         ...prev,
         {
           role: 'bot',
-          text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+          text: fallbackText,
           suggestions: ["Browse products", "Help me find something"],
           link: null
         }
       ]);
+      speak(fallbackText);
     } finally {
       setLoading(false);
     }
@@ -99,7 +104,7 @@ export default function Chatbot() {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    sendMessage(suggestion);
+    sendMessage(suggestion, 'suggestion');
   };
 
   return (

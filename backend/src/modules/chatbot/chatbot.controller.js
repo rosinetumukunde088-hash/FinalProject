@@ -3,7 +3,7 @@ const chatbotService = require('./chatbot.service');
 class ChatbotController {
   async sendMessage(req, res, next) {
     try {
-      const { message } = req.body;
+      const { message, source } = req.body;
 
       if (!message || typeof message !== 'string' || message.trim().length === 0) {
         return res.status(400).json({ error: 'Message is required' });
@@ -13,7 +13,7 @@ class ChatbotController {
         return res.status(400).json({ error: 'Message too long (max 500 characters)' });
       }
 
-      const response = await chatbotService.getResponse(message.trim());
+      const response = await chatbotService.getResponse(message.trim(), source === 'suggestion' ? 'suggestion' : 'typed');
 
       res.json({
         reply: response.text,

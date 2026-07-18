@@ -167,8 +167,23 @@ const LANGUAGE_NAMES = {
   sw: ['kiswahili', 'swahili'],
 };
 
-const SWITCH_VERBS = /\b(change|switch|set|hindura|hindukanya|badilisha|geuza)\b/i;
-const IN_LANGUAGE_PATTERN = /\b(in|to)\s+(english|kinyarwanda|ikinyarwanda|icyongereza|kiingereza|kiswahili|swahili)\b/i;
+// Explicit "switch/change" verbs — strong enough signal on their own once a
+// language name is also present in the message.
+const SWITCH_VERBS = /\b(change|switch|set|turn\s*on|turn\s*off|enable|activate|hindura|hindukanya|badilisha|geuza)\b/i;
+
+// Softer "go to / put it in" style verbs (e.g. "jya mu Kinyarwanda") — only
+// treated as a language-switch when paired with an explicit language name,
+// since on their own they're too generic (e.g. "jya" = "go").
+const GO_TO_VERBS = /\b(jya|genda|shyira|gira|koresha|tumia|weka|fanya)\b/i;
+
+const IN_LANGUAGE_PATTERN = /\b(in|to|into)\s+(english|kinyarwanda|ikinyarwanda|icyongereza|kiingereza|kiswahili|swahili)\b/i;
+const MODE_PATTERN = /\b(english|kinyarwanda|ikinyarwanda|icyongereza|kiingereza|kiswahili|swahili)\s+mode\b/i;
+
+// "language" itself, in each supported language — used to confirm intent when
+// no target language is named (e.g. "hindura ururimi" = "change the language").
+const LANGUAGE_NOUN = /\b(language|ururimi|ikirimi|lugha)\b/i;
+const RW_MARKERS = /\b(hindura|hindukanya|ururimi|ikirimi|jya|genda)\b/i;
+const SW_MARKERS = /\b(badilisha|lugha|tumia|weka|fanya)\b/i;
 
 const LANGUAGE_SWITCH_RESPONSES = {
   en: {
@@ -185,17 +200,63 @@ const LANGUAGE_SWITCH_RESPONSES = {
   },
 };
 
+// General vocabulary used to recognize which language an ordinary message is
+// written in (as opposed to SWITCH_VERBS/GO_TO_VERBS above, which only detect
+// an explicit "change the language" command). Any message sent to the AI —
+// not just explicit switch commands — uses this to keep the whole site's
+// language in sync with whatever language the user is typing in.
+const RW_LANG_WORDS = /\b(muraho|mwaramutse|amakuru|murakoze|ndabizi|sinzi|yego|oya|ndashaka|nshaka|mfasha|ndagira|ese|cyangwa|kandi|ariko|ntabwo|ibicuruzwa|igicuruzwa|akabari|ikirimi|ururimi|urubuga|kugura|gucuruza|amafaranga|nkunda|nifuza|nkeneye|ndashimira|neza|byiza|hindura|umukiriya|umuguzi|iyi|aha|hano|gute|ryari|kuki|witwa|nitwa)\b/i;
+const SW_LANG_WORDS = /\b(habari|jambo|asante|karibu|tafadhali|ninahitaji|nataka|naomba|ndiyo|hapana|sawa|bidhaa|nunua|pesa|lugha|msaada|samahani|kwaheri|mimi|wewe|sisi|badilisha|nzuri|vizuri|rafiki|ninaweza|unaweza|gharama|duka|wapi|lini|leo|kesho)\b/i;
+const EN_LANG_WORDS = /\b(hello|hi|hey|please|thanks|thank|want|need|show|help|find|looking|cart|product|products|buy|price|order|account|login|sign|register|good|morning|afternoon|evening|what|how|where|when|could|would|your|does)\b/i;
+
+const LANG_DISPLAY_NAME = { en: 'English', rw: 'Kinyarwanda', sw: 'Swahili' };
+
+function countMatches(regex, text) {
+  const matches = text.match(new RegExp(regex.source, 'gi'));
+  return matches ? matches.length : 0;
+}
+
+function detectMessageLanguage(message) {
+  const normalized = message.trim().toLowerCase();
+  if (!normalized) return null;
+
+  const scores = {
+    rw: countMatches(RW_LANG_WORDS, normalized),
+    sw: countMatches(SW_LANG_WORDS, normalized),
+    en: countMatches(EN_LANG_WORDS, normalized),
+  };
+
+  const [bestLang, bestScore] = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+  return bestScore > 0 ? bestLang : null;
+}
+
 function detectLanguageSwitch(message) {
   const normalized = message.trim().toLowerCase();
 
-  if (!SWITCH_VERBS.test(normalized) && !IN_LANGUAGE_PATTERN.test(normalized)) {
-    return null;
-  }
-
+  let explicitLang = null;
   for (const [code, names] of Object.entries(LANGUAGE_NAMES)) {
     if (names.some((name) => normalized.includes(name))) {
-      return code;
+      explicitLang = code;
+      break;
     }
+  }
+
+  if (explicitLang) {
+    const hasIntent =
+      SWITCH_VERBS.test(normalized) ||
+      GO_TO_VERBS.test(normalized) ||
+      IN_LANGUAGE_PATTERN.test(normalized) ||
+      MODE_PATTERN.test(normalized);
+    return hasIntent ? explicitLang : null;
+  }
+
+  // No language named — e.g. "hindura ururimi" ("change the language"). Only act
+  // if there's a clear switch verb plus the word "language" itself, then infer
+  // the target from which language the request is written in.
+  if (SWITCH_VERBS.test(normalized) && LANGUAGE_NOUN.test(normalized)) {
+    if (RW_MARKERS.test(normalized)) return 'rw';
+    if (SW_MARKERS.test(normalized)) return 'sw';
+    return 'en';
   }
 
   return null;
@@ -236,9 +297,13 @@ function inferRoute(message) {
   return null;
 }
 
-async function askGroq(message) {
+async function askGroq(message, langCode) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
+
+  const languageInstruction = langCode && LANG_DISPLAY_NAME[langCode]
+    ? ` Always reply in ${LANG_DISPLAY_NAME[langCode]}, the same language the user just wrote in.`
+    : '';
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -252,7 +317,7 @@ async function askGroq(message) {
         messages: [
           {
             role: 'system',
-            content: 'You are Kiramart AI, a helpful assistant for an e-commerce app in Rwanda. Help users browse products, understand the system, and simplify the interface. Keep replies concise and useful. If the user asks for an action, mention the most relevant page in one short sentence.'
+            content: `You are Kiramart AI, a helpful assistant for an e-commerce app in Rwanda. Help users browse products, understand the system, and simplify the interface. Keep replies concise and useful. If the user asks for an action, mention the most relevant page in one short sentence.${languageInstruction}`
           },
           { role: 'user', content: message }
         ],
@@ -273,7 +338,7 @@ async function askGroq(message) {
 }
 
 class ChatbotService {
-  async getResponse(message) {
+  async getResponse(message, source = 'typed') {
     const langSwitch = detectLanguageSwitch(message);
     if (langSwitch) {
       const langResponse = LANGUAGE_SWITCH_RESPONSES[langSwitch];
@@ -284,6 +349,11 @@ class ChatbotService {
         action: { type: 'setLanguage', lang: langSwitch },
       };
     }
+
+    // Only infer the ambient language from messages the user actually typed —
+    // canned suggestion chips are always in English regardless of the site's
+    // current language, so clicking one shouldn't silently switch it back.
+    const detectedLang = source === 'suggestion' ? null : detectMessageLanguage(message);
 
     const response = matchIntent(message);
     const route = inferRoute(message);
@@ -305,7 +375,7 @@ class ChatbotService {
       // Database not available, continue without context
     }
 
-    const groqReply = await askGroq(message);
+    const groqReply = await askGroq(message, detectedLang);
     if (groqReply) {
       finalText = groqReply;
     }
@@ -317,7 +387,7 @@ class ChatbotService {
       text: `${finalText}${contextualAddition}`.trim(),
       link,
       suggestions: suggestions.slice(0, 4),
-      action: null,
+      action: detectedLang ? { type: 'setLanguage', lang: detectedLang } : null,
     };
   }
 }

@@ -103,13 +103,6 @@ export default function ProductDetail() {
             <p className="pd-section-text">{getLocalizedDescription(product)}</p>
           </div>
 
-          {lang !== 'rw' && product.descriptionRw && (
-            <div className="pd-translation-card">
-              <h3 className="pd-translation-title">{t('product.descriptionRw')}</h3>
-              <p className="pd-translation-text">{product.descriptionRw}</p>
-            </div>
-          )}
-
           <div className="pd-meta">
             <FiClock />
             <span>{t('product.added')} {new Date(product.createdAt).toLocaleDateString()}</span>

@@ -13,11 +13,15 @@ const authenticate = async (req, res, next) => {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, name: true, email: true, role: true, category: true },
+      select: { id: true, name: true, email: true, role: true, category: true, isActive: true },
     });
 
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({ message: 'Your account has been deactivated' });
     }
 
     req.user = user;
@@ -37,4 +41,47 @@ const authorizeAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, authorizeAdmin };
+const authorizeTrader = (req, res, next) => {
+  if (req.user.role !== 'TRADER') {
+    return res.status(403).json({ message: 'Trader access required' });
+  }
+  next();
+};
+
+const authorizeAdminOrTrader = (req, res, next) => {
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'TRADER') {
+    return res.status(403).json({ message: 'Admin or trader access required' });
+  }
+  next();
+};
+
+const authorizeManager = (req, res, next) => {
+  if (req.user.role !== 'MANAGER') {
+    return res.status(403).json({ message: 'Manager access required' });
+  }
+  next();
+};
+
+const authorizeAdminOrManager = (req, res, next) => {
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'MANAGER') {
+    return res.status(403).json({ message: 'Admin or manager access required' });
+  }
+  next();
+};
+
+const authorizeStoreStaff = (req, res, next) => {
+  if (!['ADMIN', 'TRADER', 'MANAGER'].includes(req.user.role)) {
+    return res.status(403).json({ message: 'Staff access required' });
+  }
+  next();
+};
+
+module.exports = {
+  authenticate,
+  authorizeAdmin,
+  authorizeTrader,
+  authorizeAdminOrTrader,
+  authorizeManager,
+  authorizeAdminOrManager,
+  authorizeStoreStaff,
+};

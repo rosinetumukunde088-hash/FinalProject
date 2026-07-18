@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { FiMail, FiLock, FiUser, FiPhone } from 'react-icons/fi';
+import { FiMail, FiLock, FiUser, FiPhone, FiShoppingBag, FiBriefcase, FiCheck } from 'react-icons/fi';
 
 export default function Register() {
   const { register, user } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', role: 'USER' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
 
   if (user) { navigate('/'); return null; }
 
@@ -19,8 +20,12 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
-      await register(form);
-      navigate('/');
+      const data = await register(form);
+      if (data.pending) {
+        setPending(true);
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -29,6 +34,25 @@ export default function Register() {
   };
 
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  if (pending) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+              <FiCheck size={28} />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('register.pendingTitle')}</h1>
+            <p className="text-gray-500 mb-6">{t('register.pendingMessage')}</p>
+            <Link to="/login" className="text-emerald-600 hover:text-emerald-700 hover:underline font-medium">
+              {t('register.backToLogin')}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -44,6 +68,37 @@ export default function Register() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('register.accountType')}</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, role: 'USER' })}
+                  className={`flex flex-col items-center text-center px-4 py-3 rounded-xl border transition ${
+                    form.role === 'USER'
+                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <FiShoppingBag size={20} className="mb-1" />
+                  <span className="font-semibold text-sm">{t('register.client')}</span>
+                  <span className="text-xs text-gray-500 mt-0.5">{t('register.clientDesc')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, role: 'TRADER' })}
+                  className={`flex flex-col items-center text-center px-4 py-3 rounded-xl border transition ${
+                    form.role === 'TRADER'
+                      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                  }`}
+                >
+                  <FiBriefcase size={20} className="mb-1" />
+                  <span className="font-semibold text-sm">{t('register.trader')}</span>
+                  <span className="text-xs text-gray-500 mt-0.5">{t('register.traderDesc')}</span>
+                </button>
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('register.name')}</label>
               <div className="relative">

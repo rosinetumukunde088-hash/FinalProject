@@ -2,8 +2,8 @@ const { prisma } = require('../../config/db');
 const { paginate } = require('../../utils/helpers');
 
 class ProductService {
-  async create(data) {
-    return prisma.product.create({ data });
+  async create(data, userId) {
+    return prisma.product.create({ data: { ...data, createdById: userId || null } });
   }
 
   async findAll(query) {
@@ -27,6 +27,10 @@ class ProductService {
 
     if (query.maxPrice) {
       where.price = { ...where.price, lte: parseFloat(query.maxPrice) };
+    }
+
+    if (query.ownerId) {
+      where.createdById = query.ownerId;
     }
 
     const [products, total] = await Promise.all([
@@ -58,13 +62,19 @@ class ProductService {
     return product;
   }
 
-  async update(id, data) {
-    await this.findById(id);
+  async update(id, data, user) {
+    const product = await this.findById(id);
+    if (user.role === 'TRADER' && product.createdById !== user.id) {
+      throw Object.assign(new Error('You can only edit your own products'), { statusCode: 403 });
+    }
     return prisma.product.update({ where: { id }, data });
   }
 
-  async delete(id) {
-    await this.findById(id);
+  async delete(id, user) {
+    const product = await this.findById(id);
+    if (user.role === 'TRADER' && product.createdById !== user.id) {
+      throw Object.assign(new Error('You can only delete your own products'), { statusCode: 403 });
+    }
     await prisma.product.delete({ where: { id } });
     return { message: 'Product deleted successfully' };
   }
