@@ -1,7 +1,11 @@
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
+const { PrismaPg } = require('@prisma/adapter-pg');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 const PRODUCT_IMAGES = {
   agaseke: [
@@ -78,7 +82,7 @@ async function main() {
   const userPassword = await bcrypt.hash('user123', 12);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@kiramart.rw' },
+    where: { email: 'rosinetumukunde08@gmail.com' },
     update: {},
     create: {
       name: 'tumukunde rosine',
